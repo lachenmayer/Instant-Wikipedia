@@ -1,0 +1,11 @@
+#instantwiki {
+  background: white;
+  width: 300px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: none;
+  border-radius: 5px;
+  box-shadow: 0 0 5px #ccc;
+  padding: 10px;
+}

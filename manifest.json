@@ -1,0 +1,22 @@
+{
+  "name": "Instant Wikipedia",
+  "version": "0.0.1",
+  "description": "INSTANT KNOWLEDGE",
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*.wikipedia.org/*"
+      ],
+      "css": [
+        "instant_wiki.css"
+      ],
+      "js": [
+        "jquery.js",
+        "instant_wiki.js"
+      ]
+    }
+  ],
+  "permissions": [
+    "http://*.wikipedia.org/*"
+  ]
+}
