@@ -3,60 +3,63 @@
 // TODO: don't show on Wikimedia links
 // TODO: off screen
 
-var visible = false;
-
-var cacheContent = function(e) {
-  var content = $("#instantwiki").html();
-  if (content != "") {
-    localStorage[e.currentTarget.href] = content;
-  }
-}
-
-var show = function(e) {
-  var instantWiki = $("#instantwiki");
-  var cached = localStorage[e.currentTarget.href];
-  if (cached != undefined && cached != "") {
-    instantWiki.html(cached);
-    console.log("cached");
-  } else {
-    // we need to check for info-boxes, as there could be 
-    // <p>'s embedded in them -- we could use the ">" (direct child)
-    // CSS selector, but that has proven to be unreliable
-    $("<div>").load(e.currentTarget.href + "#bodyContent .infobox",
-    function() {
-      var selector = "#bodyContent ";
-      var firstP = "p:first:not(:has(small))";
-
-      if ($(this).children().length) {
-        selector += ".infobox ~ " + firstP;
-      } else {
-        selector += firstP;
-      }
-
-      instantWiki.load(e.currentTarget.href + selector, cacheContent(e))
-    });
-  }
-  instantWiki.fadeIn()
-             .css({
-               "top": e.clientY + 20,
-               "left": e.clientX
-             });
-  visible = true;
-  console.log("in");
-}
-
-var hide = function() {
-  if (visible) {
-    $("#instantwiki").fadeOut(function() {
-      $(this).empty();
-    });
-    console.log("out");
-    visible = false;
-  }
-}
 
 $(document).ready(function() {
   $("#bodyContent").append("<div id=instantwiki></div>");
+  var $instantWiki = $("#instantwiki");
+
+  var cacheContent = function(e) {
+    var content = $instantWiki.html();
+    if (content != "") {
+      localStorage[e.currentTarget.href] = content;
+    }
+  }
+
+  var loadContent = function(e) {
+    var cached = localStorage[e.currentTarget.href];
+    if (cached != undefined && cached != "") {
+      $instantWiki.html(cached);
+    } else {
+      // we need to check for info-boxes, as there could be 
+      // <p>'s embedded in them -- we could use the ">" (direct child)
+      // CSS selector, but that has proven to be unreliable
+      $("<div>").load(e.currentTarget.href + "#bodyContent .infobox",
+      function() {
+        var selector = "#bodyContent ";
+        var firstP = "p:first:not(:has(#coordinates))";
+
+        if ($(this).children().length) {
+          selector += ".infobox ~ " + firstP;
+        } else {
+          selector += firstP;
+        }
+
+        $instantWiki.load(e.currentTarget.href + selector, cacheContent(e))
+      });
+    }
+  }
+
+  var show = function(e) {
+    loadContent(e);
+    console.log($("#instantwiki"));
+    console.log($instantWiki);
+    $instantWiki.stop(true, true)
+               .fadeIn()
+               .css({
+                 "top": e.clientY + 20,
+                 "left": e.clientX
+               });
+    console.log("in");
+  }
+
+  var hide = function() {
+    console.log("out");
+    $instantWiki.stop(true, true)
+               .fadeOut(function() {
+                 $(this).empty().hide();
+               });
+  }
+
   $("#bodyContent a[href^='/wiki/']").removeAttr("title") // remove tooltip
                                      .hover(show, hide);
   $(document).scroll(hide);
