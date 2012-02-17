@@ -5,18 +5,15 @@
   "content_scripts": [
     {
       "matches": [
-        "http://*.wikipedia.org/*"
+        "*://*.wikipedia.org/*"
       ],
       "css": [
         "instant_wiki.css"
       ],
       "js": [
-        "jquery.js",
+        "jquery-1.7.1.min.js",
         "instant_wiki.js"
       ]
     }
-  ],
-  "permissions": [
-    "http://*.wikipedia.org/*"
   ]
 }

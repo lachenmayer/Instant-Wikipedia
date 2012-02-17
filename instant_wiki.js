@@ -1,44 +1,64 @@
-$(document).ready(function(){
+// TODO: http://en.wikipedia.org/wiki/Glacis (has small...)
+// TODO: http://en.wikipedia.org/wiki/Snow (infobox)
+// TODO: don't show on Wikimedia links
+// TODO: off screen
 
-  var showInstantWiki = function(e, selector) {
-    $("#instantwiki").load(e.currentTarget.href + selector)
-                     .fadeIn()
-                     .css({
-                        "top": e.clientY + 20,
-                        "left": e.clientX
-                     });
+var visible = false;
+
+var cacheContent = function(e) {
+  var content = $("#instantwiki").html();
+  if (content != "") {
+    localStorage[e.currentTarget.href] = content;
   }
+}
 
-  var mouseIn = function(e) {
+var show = function(e) {
+  var instantWiki = $("#instantwiki");
+  var cached = localStorage[e.currentTarget.href];
+  if (cached != undefined && cached != "") {
+    instantWiki.html(cached);
+    console.log("cached");
+  } else {
     // we need to check for info-boxes, as there could be 
     // <p>'s embedded in them -- we could use the ">" (direct child)
     // CSS selector, but that has proven to be unreliable
     $("<div>").load(e.currentTarget.href + "#bodyContent .infobox",
     function() {
-
-      // handles nasty stuff like the little co-ordinates shown in
-      // the top-right corner of the page (e.g. /wiki/NASA)
+      var selector = "#bodyContent ";
       var firstP = "p:first:not(:has(small))";
 
       if ($(this).children().length) {
-        showInstantWiki(e, "#bodyContent .infobox ~ " + firstP);
+        selector += ".infobox ~ " + firstP;
       } else {
-        showInstantWiki(e, "#bodyContent " + firstP);
+        selector += firstP;
       }
-    });
-    console.log("in");
-  }
 
-  var mouseOut = function() {
+      instantWiki.load(e.currentTarget.href + selector, cacheContent(e))
+    });
+  }
+  instantWiki.fadeIn()
+             .css({
+               "top": e.clientY + 20,
+               "left": e.clientX
+             });
+  visible = true;
+  console.log("in");
+}
+
+var hide = function() {
+  if (visible) {
     $("#instantwiki").fadeOut(function() {
       $(this).empty();
     });
     console.log("out");
+    visible = false;
   }
+}
 
+$(document).ready(function() {
   $("#bodyContent").append("<div id=instantwiki></div>");
-
-  $("#bodyContent a[href^='/wiki/']").removeAttr("title")
-                                     .hover(mouseIn, mouseOut);
-
+  $("#bodyContent a[href^='/wiki/']").removeAttr("title") // remove tooltip
+                                     .hover(show, hide);
+  $(document).scroll(hide);
 });
+
