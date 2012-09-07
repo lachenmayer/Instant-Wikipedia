@@ -3,13 +3,11 @@
 // TODO: don't show on Wikimedia links
 // TODO: off screen
 
-
-$(document).ready(function() {
-  $("#bodyContent").append("<div id=instantwiki></div>");
-  var $instantWiki = $("#instantwiki");
+var instantWiki = (function() {
+  var iw = "#instantwiki";
 
   var cacheContent = function(e) {
-    var content = $instantWiki.html();
+    var content = $(iw).html();
     if (content != "") {
       localStorage[e.currentTarget.href] = content;
     }
@@ -18,7 +16,7 @@ $(document).ready(function() {
   var loadContent = function(e) {
     var cached = localStorage[e.currentTarget.href];
     if (cached != undefined && cached != "") {
-      $instantWiki.html(cached);
+      $(iw).html(cached);
     } else {
       // we need to check for info-boxes, as there could be 
       // <p>'s embedded in them -- we could use the ">" (direct child)
@@ -34,34 +32,36 @@ $(document).ready(function() {
           selector += firstP;
         }
 
-        $instantWiki.load(e.currentTarget.href + selector, cacheContent(e))
+        $(iw).load(e.currentTarget.href + selector, cacheContent(e))
       });
     }
   }
 
-  var show = function(e) {
-    loadContent(e);
-    console.log($("#instantwiki"));
-    console.log($instantWiki);
-    $instantWiki.stop(true, true)
-               .fadeIn()
-               .css({
-                 "top": e.clientY + 20,
-                 "left": e.clientX
-               });
-    console.log("in");
-  }
+  return {
+    show: function(e) {
+      loadContent(e);
+      $(iw).stop(true, true)
+           .fadeIn()
+           .css({
+             "top": e.clientY + 20,
+             "left": e.clientX
+           });
+    },
 
-  var hide = function() {
-    console.log("out");
-    $instantWiki.stop(true, true)
-               .fadeOut(function() {
-                 $(this).empty().hide();
-               });
+    hide: function() {
+      $(iw).stop(true, true)
+           .fadeOut(function() {
+             $(this).empty().hide();
+           });
+    }
   }
+})();
+
+$(document).ready(function() {
+  $("#bodyContent").append("<div id=instantwiki></div>");
 
   $("#bodyContent a[href^='/wiki/']").removeAttr("title") // remove tooltip
-                                     .hover(show, hide);
-  $(document).scroll(hide);
+                                     .hover(instantWiki.show, instantWiki.hide);
+  $(document).scroll(instantWiki.hide);
 });
 
