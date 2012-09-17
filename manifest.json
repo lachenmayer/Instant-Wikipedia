@@ -1,5 +1,6 @@
 {
   "name": "Instant Wikipedia",
+  "manifest_version": 2,
   "version": "0.0.1",
   "description": "INSTANT KNOWLEDGE",
   "content_scripts": [
