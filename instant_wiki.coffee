@@ -1,3 +1,14 @@
+# Constants
+
+PADDING = 20
+
+# Extensions
+
+Number.prototype.limit = (max) ->
+  return Math.min this, max
+
+# The Meat
+
 existingBoxes = {}
 class InstantWikiBox
   generateId = (link) ->
@@ -8,7 +19,7 @@ class InstantWikiBox
     id = "iw-" + Math.random().toString().substring(2, 10)
     localStorage[link] = id
     return id
-
+  
   constructor: (@link) ->
     @id = generateId @link
     if existingBoxes[@id]?
@@ -16,23 +27,25 @@ class InstantWikiBox
     $('#bodyContent').append('<div id=' + @id + ' class=instantwiki></div>')
     @selector = $ '#' + @id
     existingBoxes[@id] = this
-
+  
   getPageSummary: () ->
     @selector.load(@link + '#bodyContent p:first:not(:has(#coordinates))')
-
+  
   show: (x, y) ->
     if @selector.html().length == 0
       @getPageSummary()
-      @selector.stop(true, true)
-        .fadeIn()
-        .css {
-          "left": x
-          "top": y + 20
-        }
-
+    x = x.limit $(window).width() - @selector.width() - 2*PADDING
+    if y > $(window).height() - @selector.height() - PADDING
+      y -= @selector.height() + 2*PADDING
+    else
+      y += PADDING
+    @selector.stop(true, true).fadeIn().css {
+      "left": x
+      "top": y
+    }
+  
   hide: () ->
-    @selector.stop(true, true)
-      .fadeOut()
+    @selector.stop(true, true).fadeOut()
 
 show = (e) ->
   iw = new InstantWikiBox e.currentTarget.href
