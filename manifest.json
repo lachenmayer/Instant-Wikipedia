@@ -1,8 +1,12 @@
 {
   "name": "Instant Wikipedia",
   "manifest_version": 2,
-  "version": "0.0.1",
-  "description": "INSTANT KNOWLEDGE",
+  "version": "0.1.0",
+  "description": "Hover over a link on Wikipedia to read its opening paragraph.",
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
   "content_scripts": [
     {
       "matches": [
